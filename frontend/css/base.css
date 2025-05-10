@@ -1,0 +1,42 @@
+.container{
+  display: flex;
+  justify-content: center;
+  align-items: center;     
+  height: 90vh;        
+  text-align: center;     
+  flex-direction: column; 
+}
+
+h1{
+    font-size: 100pt;
+    margin: 20pt;
+}
+
+.btn {
+  display: inline-block;
+  margin: 10pt 0;
+  padding: 10pt;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 5px;
+  font-size: 50pt;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+input{
+    font-size: 30pt;
+    padding: 10px;
+    margin: 10pt 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+img{
+  height: 400pt;
+}
