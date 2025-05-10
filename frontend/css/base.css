@@ -1,42 +1,81 @@
-.container{
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1; /* This makes main take up the remaining space */
+}
+
+footer {
+  text-align: center;
+  padding: 0.5rem 1rem;
+}
+
+
+body {
+  display: grid;
+
+}
+
+nav {
+  padding: 1rem;
+}
+
+.profile-nav{
+  text-decoration: none;
+  padding: 0pt !important;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-link{
+  border-radius: 8pt;
+}
+
+ .nav-link:hover{
+  background-color: white;
+  color: #c89e2b !important;
+}
+
+
+.active-link{
+  background-color: var(--color-white) !important;
+  color: black !important;
+}
+
+
+.profile-nav:hover {
+  background-color: white !important;
+  color: black !important;
+}  
+
+
+footer {
+  text-align: center;
+  padding: 0.5rem 1rem;
+}
+
+.center-container{
   display: flex;
   justify-content: center;
   align-items: center;     
-  height: 90vh;        
+  height: 100%;        
   text-align: center;     
   flex-direction: column; 
 }
 
-h1{
-    font-size: 100pt;
-    margin: 20pt;
+.img{
+  height: 220pt;
 }
 
-.btn {
-  display: inline-block;
-  margin: 10pt 0;
-  padding: 10pt;
-  background-color: #007bff;
-  color: white;
-  text-decoration: none;
-  border: none;
-  border-radius: 5px;
-  font-size: 50pt;
-  cursor: pointer;
-}
-
-.btn:hover {
-  background-color: #0056b3;
-}
-
-input{
-    font-size: 30pt;
-    padding: 10px;
-    margin: 10pt 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-img{
-  height: 400pt;
+.dropdown-item:hover {
+  background-color: #f8f9fa !important; /* Bootstrap's `bg-light` */
+  color: #000 !important;
 }

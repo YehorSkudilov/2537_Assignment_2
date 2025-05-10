@@ -7,13 +7,13 @@ import bcrypt from 'bcrypt';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import Joi from 'joi';
+import expressLayouts from "express-ejs-layouts";
+import fs from "fs";
 
 dotenv.config();
 const app = express();
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const port = process.env.PORT || 9000;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 //Mongo DB connection
 const mongoUser = process.env.MONGODB_USER;
@@ -27,6 +27,13 @@ const client = new MongoClient(mongoURI);
 await client.connect();
 
 const db = client.db(mongoDB);
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "frontend/views"));
+app.use(expressLayouts);
+app.set("layout", "layouts/default"); 
+app.use(express.static(path.join(__dirname, "frontend")));
+
 
 app.use("/css", express.static("./frontend/css"));
 app.use("/js", express.static("./frontend/js"));
@@ -57,7 +64,7 @@ app.use(express.json());
 
 //Block pages for not logged in users
 app.use((req, res, next) => {
-    const publicRoutes = ["/", "/login", "/signup"];
+    const publicRoutes = ["/", "/login", "/signup", "/404"];
   
     const sessionExists = req.session && req.session.email;
 
@@ -67,51 +74,90 @@ app.use((req, res, next) => {
   
     next();
   });
+
+  
   
 
 // Routes
-app.get('/', (req, res) => {
-    const sessionExists = req.session && req.session.email;
 
+app.get("/login", (req, res) => {
+    res.render("login", {
+      title: "Login",
+      pageCSS: "/css/login.css",
+      pageJS: "/js/login.js",
+      showNav: false,
+      showFooter: false
+    });
+  });
+  
+  app.get("/signup", (req, res) => {
+    res.render("signup", {
+      title: "Signup",
+      pageCSS: "/css/signup.css",
+      pageJS: "/js/signup.js",
+      showNav: false,
+      showFooter: false
+    });
+  });
+
+app.get("/", (req, res) => {
+    const sessionExists = req.session && req.session.email;
     if(sessionExists) {
-        res.sendFile(path.join(__dirname, 'frontend/pages/home.html'));
-    } else{
-        res.sendFile(path.join(__dirname, 'frontend/pages/login_home.html'));
+
+    res.redirect("/home")
+    } else {
+    
+    res.render("login_home", {
+        title: "Home",
+        pageCSS: "/css/login_home.css",
+        pageJS: "/js/login_home.js",
+        showNav: false,
+        showFooter: false
+    });
     }
 });
 
-app.get('/signup', (req, res) => {
-    const sessionExists = req.session && req.session.email;
-
-    if(sessionExists) {
-        res.redirect('/'); 
-    } else{
-        res.sendFile(path.join(__dirname, 'frontend/pages/signup.html'));
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  
+  const autoRouteDir = path.join(process.cwd(), "./frontend/views/autoRoute");
+  
+  fs.readdirSync(autoRouteDir).forEach(file => {
+    const ext = path.extname(file);
+    const name = path.basename(file, ext);
+  
+    if (ext === ".ejs") {
+      const route = `/${name}`;
+      // Check if the route is already defined
+      const isAlreadyDefined = app._router?.stack?.some(layer =>
+        layer.route?.path === route
+      ) || false;
+      
+  
+      if (!isAlreadyDefined) {
+        app.get(route, (req, res) => {
+          res.render(`autoRoute/${name}`, {
+            layout: "layouts/default",
+            title: capitalizeFirst(name),
+            pageCSS: `/css/${name}.css`,
+            pageJS: `/js/${name}.js`,
+            showNav: true,
+            showFooter: true
+          });
+        });
+      }
     }
-
-});
-
-app.get('/login', (req, res) => {
-    const sessionExists = req.session && req.session.email;
-
-    if(sessionExists) {
-        res.redirect('/'); 
-    } else{
-        res.sendFile(path.join(__dirname, 'frontend/pages/login.html'));
-    }
-
-});
-
-app.get('/members', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/pages/members.html'));
-});
+  }); 
+  
+  
 
 app.post('/signup', async (req, res) => {
 
     const schema = Joi.object({
         name: Joi.string().max(50).required(),
         email: Joi.string().email().required(),
-        password: Joi.string().min(6).max(50).required()
+        password: Joi.string().min(1).max(50).required()
     });
 
     const validation = schema.validate(req.body);
@@ -152,7 +198,7 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
     const schema = Joi.object({
         email: Joi.string().email().required(),
-        password: Joi.string().min(6).max(50).required()
+        password: Joi.string().min(1).max(50).required()
     });
 
     const validation = schema.validate(req.body);
@@ -205,7 +251,7 @@ app.get('/session-info', (req, res) => {
 
 // 404 handler
 app.use((req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/pages/404.html'));
+    res.redirect("/404");
 });
 
 // Start server
