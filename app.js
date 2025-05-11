@@ -13,7 +13,7 @@ import fs from "fs";
 dotenv.config();
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const port = process.env.PORT || 9000;
+const port = process.env.PORT || 9001;
 
 //Mongo DB connection
 const mongoUser = process.env.MONGODB_USER;
