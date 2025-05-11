@@ -50,10 +50,13 @@ nav {
   color: black !important;
 }
 
-
-.profile-nav:hover {
+.dropdown-item:hover {
   background-color: white !important;
-  color: black !important;
+  color: #c89e2b !important;
+}  
+
+.dropdown-item {
+  color: white !important;
 }  
 
 
@@ -73,9 +76,4 @@ footer {
 
 .img{
   height: 220pt;
-}
-
-.dropdown-item:hover {
-  background-color: #f8f9fa !important; /* Bootstrap's `bg-light` */
-  color: #000 !important;
 }

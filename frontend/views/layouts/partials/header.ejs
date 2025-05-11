@@ -13,19 +13,10 @@
           <a class="nav-link text-white" href="/home">Home</a>
         </li>
         <li class="nav-item mx-1">
-          <a class="nav-link text-white" href="/transactions">Transactions</a>
+          <a class="nav-link text-white" href="/members">Members</a>
         </li>
         <li class="nav-item mx-1">
-          <a class="nav-link text-white" href="/institutions">Institutions</a>
-        </li>
-        <li class="nav-item mx-1">
-          <a class="nav-link text-white" href="/charts">Charts</a>
-        </li>
-        <li class="nav-item mx-1">
-          <a class="nav-link text-white" href="/budget">Budget</a>
-        </li>
-        <li class="nav-item mx-1">
-          <a class="nav-link text-white" href="/categories">Categories</a>
+          <a class="nav-link text-white" href="/admin">Admin</a>
         </li>
       </ul>
 
@@ -34,11 +25,17 @@
           <button class="nav-link profile-nav m-0" type="button" data-bs-toggle="dropdown">
             <img class="profileImage m-auto rounded-circle" alt="profileImage" src="/images/user.png" width="50" height="50" />
           </button>
-          <ul class="dropdown-menu dropdown-menu-end mt-4 bg-dark text-white">
-            <li><a class="dropdown-item text-white" href="/account">My Account</a></li>
-            <li><a class="dropdown-item text-white" href="/settings">Settings</a></li>
-            <li><hr class="dropdown-divider bg-light"></li>
-            <li><button type="button" class="dropdown-item text-white logout">Logout</button></li>
+          <ul class="dropdown-menu dropdown-menu-end mt-4 bg-dark">
+            <li class="px-2">
+              <a class="dropdown-item px-3 rounded" href="/account">My Account</a>
+            </li>
+            <li class="px-2">
+              <a class="dropdown-item px-3 rounded" href="/settings">Settings</a>
+            </li>
+            <li><hr class="dropdown-divider bg-light mx-3"></li>
+            <li class="px-2">
+              <button type="button" class="dropdown-item px-3 rounded logout">Logout</button>
+            </li>             
           </ul>
         </li>
       </ul>

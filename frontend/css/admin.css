@@ -1,0 +1,26 @@
+table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  th {
+    background-color: #343a40;
+    color: #fff;
+    text-align: left;
+  }
+  
+  td {
+    vertical-align: middle;
+  }
+  
+  select.form-select {
+    min-width: 120px;
+  }
+  
+  td:nth-child(3),
+th:nth-child(3) {
+  width: 120px;
+  white-space: nowrap;
+}

@@ -28,6 +28,46 @@ await client.connect();
 
 const db = client.db(mongoDB);
 
+function ensureRole(requiredRole) {
+    return async (req, res, next) => {
+      if (!req.session || !req.session.email) {
+        return res.status(401).send("Unauthorized");
+      }
+  
+      try {
+        const user = await db.collection("users").findOne(
+          { email: req.session.email },
+          { projection: { role: 1 } }
+        );
+  
+        if (!user) {
+          return res.status(401).send("User not found");
+        }
+  
+        // Live role check
+        if (user.role !== requiredRole) {
+            return res.status(403).render("access_denied", {
+                title: "Access Denied",
+                pageCSS: "/css/access_denied.css",
+                pageJS: "/js/access_denied.js",
+                showNav: true,
+                role: user.role,
+                showFooter: true
+              });
+        }
+  
+        // Optionally refresh session.role with the latest
+        req.session.role = user.role;
+  
+        next();
+      } catch (err) {
+        console.error("Role check failed:", err);
+        return res.status(500).send("Internal server error");
+      }
+    };
+  }
+  
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "frontend/views"));
 app.use(expressLayouts);
@@ -117,6 +157,19 @@ app.get("/", (req, res) => {
     }
 });
 
+app.get("/admin", ensureRole("admin"), (req, res) => {
+    res.render("admin", {
+      title: "Admin",
+      pageCSS: "/css/admin.css",
+      pageJS: "/js/admin.js",
+      showNav: true,
+      showFooter: true
+    });
+  });
+  
+  
+
+
 function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
@@ -167,7 +220,7 @@ app.post('/signup', async (req, res) => {
     }
 
     const { name, email, password } = req.body;
-
+    const role = "user"; // Default role
     const usersCollection = db.collection("users");
 
     // Check if email already exists
@@ -183,12 +236,15 @@ app.post('/signup', async (req, res) => {
     await usersCollection.insertOne({
     name,
     email,
+    role: role,
     password: hashedPassword,
     createdAt: new Date()
     });
 
     req.session.name = name;
     req.session.email = email;
+    req.session.role = role;
+
     
     console.log("Session after signup:", req.session);
 
@@ -223,6 +279,7 @@ app.post('/login', async (req, res) => {
 
     req.session.email = user.email;
     req.session.name = user.name;
+    req.session.role = user.role;
 
     res.redirect('/');
 });
@@ -248,6 +305,48 @@ app.get('/session-info', (req, res) => {
         });
     }
 });
+
+app.get("/admin/users", ensureRole("admin"), async (req, res) => {
+    const users = await db.collection("users").find({}, {
+      projection: { _id: 0, name: 1, role: 1, email: 1, createdAt: 1 }
+    }).toArray();
+  
+    res.status(200).json(users);
+  });
+  
+
+  app.post("/admin/users/update-role", ensureRole("admin"), async (req, res) => {
+    const schema = Joi.object({
+        name: Joi.string().min(1).max(50).required(),
+        newRole: Joi.string().valid("admin", "user").required()
+      });
+      
+      const validation = schema.validate(req.body);
+      if (validation.error) {
+        return res.status(400).json({ error: validation.error.details[0].message });
+      }
+      
+      const { name, newRole } = req.body;
+      
+  
+    try {
+      const result = await db.collection("users").updateOne(
+        { name },
+        { $set: { role: newRole } }
+      );
+  
+      if (result.modifiedCount === 0) {
+        return res.status(404).json({ error: "User not found or role unchanged" });
+      }
+  
+      res.status(200).json({ message: "Role updated successfully" });
+    } catch (err) {
+      console.error("Error updating role:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
+  
 
 // 404 handler
 app.use((req, res) => {
